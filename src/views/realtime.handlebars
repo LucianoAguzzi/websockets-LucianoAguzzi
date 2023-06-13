@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Productos en tiempo real</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // Evento para recibir la actualización de la lista de productos
+    socket.on('updateProducts', (products) => {
+      // Actualizar la lista de productos en la vista
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = '';
+
+      products.forEach((product) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = product;
+        productList.appendChild(listItem);
+      });
+    });
+
+    // Evento para recibir la notificación de un nuevo producto
+    socket.on('newProduct', (product) => {
+      // Mostrar una alerta o realizar alguna acción cuando se crea un nuevo producto
+      alert(`Se ha creado un nuevo producto: ${product}`);
+    });
+
+    // Evento para recibir la notificación de un producto eliminado
+    socket.on('deleteProduct', (product) => {
+      // Mostrar una alerta o realizar alguna acción cuando se elimina un producto
+      alert(`Se ha eliminado un producto: ${product}`);
+    });
+  </script>
+</head>
+<body>
+  <h1>Listado de productos en tiempo real</h1>
+
+  <ul id="product-list">
+    {{#each products}}
+      <li>{{this}}</li>
+    {{/each}}
+  </ul>
+
+  <form id="product-form">
+    <input type="text" name="productName" placeholder="Nombre del producto">
+    <button type="submit">Crear producto</button>
+  </form>
+
+  <script>
+    const productForm = document.querySelector('#product-form');
+
+    productForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const productName = document.querySelector('input[name="productName"]').value;
+
+      // Enviar los datos del formulario al servidor a través de websockets
+      socket.emit('createProduct', productName);
+
+      // Limpiar el campo del formulario después de enviar los datos
+      document.querySelector('input[name="productName"]').value = '';
+    });
+  </script>
+</body>
+</html>
+
